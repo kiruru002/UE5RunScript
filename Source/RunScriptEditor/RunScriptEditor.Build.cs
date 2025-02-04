@@ -34,13 +34,14 @@ public class RunScriptEditor : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                "RunScript",
                 "CoreUObject",
                 "Engine",
                 "Slate",
                 "SlateCore",
                 "UnrealEd",
                 "AssetRegistry",
+                "AssetDefinition",
+                "RunScript",
 				// ... add private dependencies that you statically link with here ...	
 			}
             );

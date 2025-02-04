@@ -108,7 +108,7 @@ bool URunScriptTextFactoryImport::CanReimport(UObject* Obj, TArray<FString>& Out
 void URunScriptTextFactoryImport::SetReimportPaths(UObject* Obj, const TArray<FString>& NewReimportPaths)
 {
     URunScriptText* Asset = Cast<URunScriptText>(Obj);
-    if (Asset && ensure(NewReimportPaths.Num() >= 1))
+    if (Asset && ensure(NewReimportPaths.Num() == 1))
     {
         Asset->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
     }
