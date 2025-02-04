@@ -32,7 +32,7 @@ void URunScriptCompiler::MapBlueprintAssetsByClass(UClass* ParentClass, TMap<FSt
     AssetRegistry.GetAssetsByClass(UBlueprint::StaticClass()->GetClassPathName(), AssetList, true);
     for (const FAssetData& Asset : AssetList)
     {
-        UBlueprint* Blueprint = Cast<UBlueprint>(Asset.GetAsset());
+        UBlueprint* Blueprint = Cast<UBlueprint>(Asset.FastGetAsset());
         if (Blueprint && Blueprint->GeneratedClass && Blueprint->GeneratedClass->IsChildOf(ParentClass))
         {
             OutClasses.Add(Asset.AssetName.ToString(), Blueprint->GeneratedClass);

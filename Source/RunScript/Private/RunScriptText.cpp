@@ -13,6 +13,7 @@ URunScriptText::URunScriptText()
     : Super()
     , RunCommands({})
     , SourceText(TEXT(""))
+    , AssetImportData()
 {
 
 }

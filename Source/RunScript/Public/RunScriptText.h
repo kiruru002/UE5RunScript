@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RunScript/Public/RunScriptCommand.h"
 #include "UObject/Object.h"
+#include "EditorFramework/AssetImportData.h"
 #include "RunScriptText.generated.h"
 
 // To avoid circular dependencies
@@ -40,8 +41,11 @@ public:
     TArray<FRunScriptTextExecute> RunCommands;
 
 #if WITH_EDITORONLY_DATA
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "URunScriptText")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "URunScriptText|Editor")
     FString SourceText;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Instanced, Category = "URunScriptText|Editor")
+    UAssetImportData* AssetImportData;
 #endif
 
 public:

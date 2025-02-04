@@ -4,6 +4,9 @@
 #include "RunScript/Public/RunScriptText.h"
 #include "RunScript/Public/RunScriptCommand.h"
 #include "RunScriptEditor/Public/RunScriptCompiler.h"
+#include "HAL/FileManager.h"
+#include "EditorReimportHandler.h"
+#include "EditorFramework/AssetImportData.h"
 
 URunScriptTextFactoryNew::URunScriptTextFactoryNew(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
@@ -29,7 +32,7 @@ URunScriptTextFactoryImport::URunScriptTextFactoryImport(const FObjectInitialize
     bEditAfterNew = false;
     bText = true;
     Formats.Add(TEXT("runscript;URunScriptText"));
-    ImportPriority = 1;
+    ImportPriority = DefaultImportPriority;
 }
 
 bool URunScriptTextFactoryImport::DoesSupportClass(UClass* Class)
@@ -40,6 +43,17 @@ bool URunScriptTextFactoryImport::DoesSupportClass(UClass* Class)
 UClass* URunScriptTextFactoryImport::ResolveSupportedClass()
 {
     return URunScriptText::StaticClass();
+}
+
+UObject* URunScriptTextFactoryImport::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
+{
+    UObject* Object = Super::FactoryCreateFile(InClass, InParent, InName, Flags, Filename, Parms, Warn, bOutOperationCanceled);
+    URunScriptText* Asset = Cast<URunScriptText>(Object);
+    if (Asset && Asset->AssetImportData)
+    {
+        Asset->AssetImportData->Update(Filename);
+    }
+    return Object;
 }
 
 UObject* URunScriptTextFactoryImport::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BuferEnd, FFeedbackContext* Warn)
@@ -75,6 +89,60 @@ UObject* URunScriptTextFactoryImport::FactoryCreateText(UClass* InClass, UObject
             Asset->RunCommands.Add(Command);
         }
         Asset->SourceText = Source;
+        Asset->AssetImportData = NewObject<UAssetImportData>(Asset, NAME_None);
     }
     return Asset;
+}
+
+bool URunScriptTextFactoryImport::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
+{
+    URunScriptText* Asset = Cast<URunScriptText>(Obj);
+    if (Asset && Asset->AssetImportData)
+    {
+        Asset->AssetImportData->ExtractFilenames(OutFilenames);
+        return true;
+    }
+    return false;
+}
+
+void URunScriptTextFactoryImport::SetReimportPaths(UObject* Obj, const TArray<FString>& NewReimportPaths)
+{
+    URunScriptText* Asset = Cast<URunScriptText>(Obj);
+    if (Asset && ensure(NewReimportPaths.Num() >= 1))
+    {
+        Asset->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
+    }
+}
+
+EReimportResult::Type URunScriptTextFactoryImport::Reimport(UObject* Obj)
+{
+    URunScriptText* Asset = Cast<URunScriptText>(Obj);
+    if (!Asset)
+    {
+        return EReimportResult::Failed;
+    }
+    const FString Filename = Asset->AssetImportData->GetFirstFilename();
+    if (!Filename.Len() || IFileManager::Get().FileSize(*Filename) == INDEX_NONE)
+    {
+        return EReimportResult::Failed;
+    }
+
+    bool bCanceled = false;
+    if (ImportObject(Asset->GetClass(), Asset->GetOuter(), *Asset->GetName(), RF_Public | RF_Standalone, Filename, nullptr, bCanceled) != nullptr)
+    {
+
+        Asset->AssetImportData->Update(Filename);
+
+        if (Asset->GetOuter())
+        {
+            Asset->GetOuter()->MarkPackageDirty();
+        }
+        else
+        {
+            Asset->MarkPackageDirty();
+        }
+        return EReimportResult::Succeeded;
+    }
+
+    return EReimportResult::Failed;
 }
