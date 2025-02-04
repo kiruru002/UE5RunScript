@@ -2,6 +2,7 @@
 
 #include "RunScriptText.h"
 #include "RunScript/Public/RunScriptRunner.h"
+#include "UObject/AssetRegistryTagsContext.h"
 
 FRunScriptTextExecute::FRunScriptTextExecute()
     : RunCommandClass()
@@ -35,3 +36,14 @@ URunScriptCommand* URunScriptText::ExecuteLine(URunScriptRunner* ScriptRunner, i
     bOutOfRange = true;
     return nullptr;
 }
+
+#if WITH_EDITORONLY_DATA
+void URunScriptText::GetAssetRegistryTags(FAssetRegistryTagsContext Context) const
+{
+    if (AssetImportData)
+    {
+        Context.AddTag(FAssetRegistryTag(UObject::SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
+    }
+    Super::GetAssetRegistryTags(Context);
+}
+#endif

@@ -19,11 +19,6 @@ TSoftClassPtr<UObject> UAssetDefinition_RunScriptText::GetAssetClass() const
     return URunScriptText::StaticClass();
 }
 
-EAssetCommandResult UAssetDefinition_RunScriptText::GetSourceFiles(const FAssetSourceFilesArgs& InArgs, TFunctionRef<bool(const FAssetSourceFilesResult& InSourceFile)> SourceFileFunc) const
-{
-    return EAssetCommandResult::Handled;
-}
-
 bool UAssetDefinition_RunScriptText::CanImport() const
 {
     return true;

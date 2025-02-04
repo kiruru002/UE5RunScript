@@ -54,4 +54,10 @@ public:
 
     URunScriptCommand* ExecuteLine(URunScriptRunner* ScriptRunner, int32 LineIndex, bool& bOutOfRange);
 
+#if WITH_EDITORONLY_DATA
+    // for reimport
+    // UAssetDefinition::GetSourceFiles
+    virtual void GetAssetRegistryTags(FAssetRegistryTagsContext Context) const override;
+#endif
+
 };
