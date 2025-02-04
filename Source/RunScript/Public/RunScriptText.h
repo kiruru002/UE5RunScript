@@ -17,11 +17,11 @@ struct RUNSCRIPT_API FRunScriptTextExecute
 
 public:
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FRunScriptTextExecute")
     TSubclassOf<URunScriptCommand> RunCommandClass;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
-    FString ArgumentText;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FRunScriptTextExecute")
+    FString EventString;
 
 public:
 
@@ -36,14 +36,11 @@ class RUNSCRIPT_API URunScriptText : public UObject
 
 public:
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
-    URunScriptRunner* ScriptRunner;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "URunScriptText")
     TArray<FRunScriptTextExecute> RunCommands;
 
 #if WITH_EDITORONLY_DATA
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "URunScriptText")
     FString SourceText;
 #endif
 
@@ -51,6 +48,6 @@ public:
 
     URunScriptText();
 
-    URunScriptCommand* ExecuteLine(int32 LineIndex);
+    URunScriptCommand* ExecuteLine(URunScriptRunner* ScriptRunner, int32 LineIndex, bool& bOutOfRange);
 
 };

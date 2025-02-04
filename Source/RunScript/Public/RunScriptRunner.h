@@ -15,20 +15,23 @@ class RUNSCRIPT_API URunScriptRunner : public UGameInstanceSubsystem, public FTi
 
 public:
 
-    UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+    UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "URunScriptRunner")
     bool bTickEnabled;
 
-    UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+    UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "URunScriptRunner")
     TArray<URunScriptText*> ScriptStack;
 
-    UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+    UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "URunScriptRunner")
     int32 CurrentLineIndex;
 
-    UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+    UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "URunScriptRunner")
     URunScriptCommand* CurrentCommandObject;
 
-    UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-    float CommandAccumulatedTickSeconds;
+    UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "URunScriptRunner")
+    float CommandSumTickSeconds;
+
+    UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "URunScriptRunner")
+    float ScriptSumTickSeconds;
 
 public:
 
@@ -40,7 +43,7 @@ public:
 
     void StackScript(URunScriptText* TextAsset, bool bAllowDuplicate);
 
-    UFUNCTION(BlueprintPure = false, Category = "")
+    UFUNCTION(BlueprintPure = false, Category = "URunScriptRunner")
     void StartScript(URunScriptText* TextAsset, bool bAllowDuplicate);
 
 };

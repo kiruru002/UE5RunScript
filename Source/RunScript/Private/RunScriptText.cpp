@@ -1,31 +1,36 @@
 // Copyright kiruru002. All Rights Reserved.
 
 #include "RunScriptText.h"
+#include "RunScript/Public/RunScriptRunner.h"
 
 FRunScriptTextExecute::FRunScriptTextExecute()
     : RunCommandClass()
-    , ArgumentText(TEXT(""))
+    , EventString(TEXT(""))
 {
 }
 
 URunScriptText::URunScriptText()
     : Super()
-    , ScriptRunner(nullptr)
     , RunCommands({})
     , SourceText(TEXT(""))
 {
 
 }
 
-URunScriptCommand* URunScriptText::ExecuteLine(int32 LineIndex)
+URunScriptCommand* URunScriptText::ExecuteLine(URunScriptRunner* ScriptRunner, int32 LineIndex, bool& bOutOfRange)
 {
     if (RunCommands.IsValidIndex(LineIndex))
     {
+        bOutOfRange = false;
         const FRunScriptTextExecute& Command = RunCommands[LineIndex];
-        URunScriptCommand* CommandObject = NewObject<URunScriptCommand>(this, Command.RunCommandClass, NAME_None, RF_NoFlags, nullptr);
-        CommandObject->ScriptRunner = ScriptRunner;
-        CommandObject->RunEvent(*Command.ArgumentText);
+        if (Command.RunCommandClass == URunScriptCommand::StaticClass() || !Command.RunCommandClass->IsChildOf(URunScriptCommand::StaticClass()))
+        {
+            return nullptr;
+        }
+        URunScriptCommand* CommandObject = NewObject<URunScriptCommand>(ScriptRunner, Command.RunCommandClass, NAME_None, RF_NoFlags, nullptr);
+        CommandObject->RunEvent(Command.EventString);
         return CommandObject;
     }
+    bOutOfRange = true;
     return nullptr;
 }

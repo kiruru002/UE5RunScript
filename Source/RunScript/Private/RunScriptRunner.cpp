@@ -10,7 +10,8 @@ URunScriptRunner::URunScriptRunner()
     , bTickEnabled(true)
     , ScriptStack({})
     , CurrentLineIndex(0)
-    , CommandAccumulatedTickSeconds(0.0f)
+    , CommandSumTickSeconds(0.0f)
+    , ScriptSumTickSeconds(0.0f)
 {
 }
 
@@ -18,29 +19,32 @@ void URunScriptRunner::Tick(float DeltaSeconds)
 {
     if (!ScriptStack.IsEmpty())
     {
+        ScriptSumTickSeconds += DeltaSeconds;
         URunScriptText* CurrentScript = ScriptStack[0];
-        if (IsValid(CurrentCommandObject))
+        bool bOutOfRange = false;
+        if (CurrentCommandObject && CurrentCommandObject->ContinueTick)
         {
-            CommandAccumulatedTickSeconds += DeltaSeconds;
-            CurrentCommandObject->Tick(DeltaSeconds);
+            CommandSumTickSeconds += DeltaSeconds;
+            CurrentCommandObject->Tick(this, DeltaSeconds);
         }
         else
         {
-            CommandAccumulatedTickSeconds = 0.0f;
-            CurrentCommandObject = CurrentScript->ExecuteLine(CurrentLineIndex);
+            CommandSumTickSeconds = 0.0f;
+            CurrentCommandObject = CurrentScript->ExecuteLine(this, CurrentLineIndex, bOutOfRange);
         }
         // loop until next tick command
-        while (CurrentCommandObject && !CurrentCommandObject->ContinueTick)
+        while (!bOutOfRange && (!CurrentCommandObject || !CurrentCommandObject->ContinueTick))
         {
             CurrentLineIndex++;
-            CommandAccumulatedTickSeconds = 0.0f;
-            CurrentCommandObject = CurrentScript->ExecuteLine(CurrentLineIndex);
+            CommandSumTickSeconds = 0.0f;
+            CurrentCommandObject = CurrentScript->ExecuteLine(this, CurrentLineIndex, bOutOfRange);
         }
         // finish
-        if (!IsValid(CurrentCommandObject))
+        if (bOutOfRange && (!CurrentCommandObject || !CurrentCommandObject->ContinueTick))
         {
             ScriptStack.RemoveAt(0);
             CurrentLineIndex = 0;
+            ScriptSumTickSeconds = 0.0f;
         }
     }
 }
@@ -57,9 +61,8 @@ bool URunScriptRunner::IsTickable() const
 
 void URunScriptRunner::StackScript(URunScriptText* TextAsset, bool bAllowDuplicate)
 {
-    if (bAllowDuplicate || ScriptStack.Find(TextAsset) == INDEX_NONE)
+    if (TextAsset && (bAllowDuplicate || ScriptStack.Find(TextAsset) == INDEX_NONE))
     {
-        TextAsset->ScriptRunner = this;
         ScriptStack.Add(TextAsset);
     }
 }
