@@ -8,26 +8,11 @@
 #include "EditorReimportHandler.h"
 #include "EditorFramework/AssetImportData.h"
 
-URunScriptTextFactoryNew::URunScriptTextFactoryNew(const FObjectInitializer& ObjectInitializer)
-    : Super(ObjectInitializer)
-{
-    SupportedClass = URunScriptText::StaticClass();
-    bCreateNew = true;
-    bEditorImport = false;
-    bEditAfterNew = false;
-}
-
-UObject* URunScriptTextFactoryNew::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
-{
-    return NewObject<URunScriptText>(InParent, SupportedClass, InName, Flags | RF_Transactional);
-}
-
-
 URunScriptTextFactoryImport::URunScriptTextFactoryImport(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
 {
     SupportedClass = URunScriptText::StaticClass();
-    bCreateNew = false;
+    bCreateNew = true;
     bEditorImport = true;
     bEditAfterNew = false;
     bText = true;
@@ -43,6 +28,11 @@ bool URunScriptTextFactoryImport::DoesSupportClass(UClass* Class)
 UClass* URunScriptTextFactoryImport::ResolveSupportedClass()
 {
     return URunScriptText::StaticClass();
+}
+
+UObject* URunScriptTextFactoryImport::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+{
+    return NewObject<URunScriptText>(InParent, SupportedClass, InName, Flags | RF_Transactional);
 }
 
 UObject* URunScriptTextFactoryImport::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)

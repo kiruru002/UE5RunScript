@@ -19,6 +19,12 @@ TSoftClassPtr<UObject> UAssetDefinition_RunScriptText::GetAssetClass() const
     return URunScriptText::StaticClass();
 }
 
+TConstArrayView<FAssetCategoryPath> UAssetDefinition_RunScriptText::GetAssetCategories() const
+{
+    static const auto Categories = {EAssetCategoryPaths::Misc};
+    return Categories;
+}
+
 bool UAssetDefinition_RunScriptText::CanImport() const
 {
     return true;

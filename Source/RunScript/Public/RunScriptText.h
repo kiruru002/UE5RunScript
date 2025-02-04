@@ -41,10 +41,10 @@ public:
     TArray<FRunScriptTextExecute> RunCommands;
 
 #if WITH_EDITORONLY_DATA
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "URunScriptText|Editor")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "URunScriptText|Source")
     FString SourceText;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, Category = "URunScriptText|Editor")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, Category = "URunScriptText|Source")
     UAssetImportData* AssetImportData;
 #endif
 
